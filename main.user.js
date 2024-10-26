@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Adblock
+// @name         Ads
 // @namespace    http://Roblox-Thot.github.io
-// @version      2024-10-26-2
+// @version      2024-10-26-3
 // @description  A browser script made to give enhancements on miniblox.io
 // @author       Roblox-Thot
 // @match        https://miniblox.io/*
@@ -9,6 +9,7 @@
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
+
 let replacements = {};
 
 function addReplacement(replacement, code, replaceit) {
@@ -32,18 +33,21 @@ function modifyCode(text) {
 
 (function() {
 	'use strict';
+
+	addReplacement('document.addEventListener("DOMContentLoaded",startGame,!1);', `
+		setTimeout(function() {
+			var DOMContentLoaded_event = document.createEvent("Event");
+			DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true);
+			document.dispatchEvent(DOMContentLoaded_event);
+		}, 0);
+	`);
+
 	addReplacement('this.game.unleash.isEnabled("disable-ads")', 'true', true);
 
 	async function execute(src, oldScript) {
 		if (oldScript) oldScript.type = 'javascript/blocked';
 		await fetch(src).then(e => e.text()).then(e => modifyCode(e));
 		if (oldScript) oldScript.type = 'module';
-		await new Promise((resolve) => {
-			const loop = setInterval(async function() {
-				resolve();
-				clearInterval(loop);
-			}, 10);
-		});
 	}
 
 	// https://stackoverflow.com/questions/22141205/intercept-and-alter-a-sites-javascript-using-greasemonkey
@@ -55,8 +59,7 @@ function modifyCode(text) {
 				execute(e.target.src);
 			}
 		}, false);
-	}
-	else {
+	} else {
 		new MutationObserver(async (mutations, observer) => {
 			let oldScript = mutations
 				.flatMap(e => [...e.addedNodes])
