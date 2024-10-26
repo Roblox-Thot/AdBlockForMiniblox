@@ -1,13 +1,11 @@
 // ==UserScript==
-// @name         Vape V4
-// @namespace    http://7granddadpgn.github.io
-// @version      2024-07-29
+// @name         Adblock
+// @namespace    http://Roblox-Thot.github.io
+// @version      2024-10-26
 // @description  A browser script made to give enhancements on miniblox.io
-// @author       7GrandDad
+// @author       Roblox-Thot
 // @match        https://miniblox.io/*
 // @icon         https://miniblox.io/favicon.png
-// @grant        GM_getValue
-// @grant        GM_setValue
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
