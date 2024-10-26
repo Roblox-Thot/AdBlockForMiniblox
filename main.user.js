@@ -8,7 +8,8 @@
 // @icon         https://miniblox.io/favicon.png
 // @grant        unsafeWindow
 // @run-at       document-start
-// ==/UserScript==let replacements = {};
+// ==/UserScript==
+let replacements = {};
 
 function addReplacement(replacement, code, replaceit) {
 	replacements[replacement] = [code, replaceit];
