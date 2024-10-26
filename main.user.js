@@ -1,39 +1,61 @@
 // ==UserScript==
 // @name         Adblock
 // @namespace    http://Roblox-Thot.github.io
-// @version      2024-10-26
+// @version      2024-10-26-2
 // @description  A browser script made to give enhancements on miniblox.io
 // @author       Roblox-Thot
 // @match        https://miniblox.io/*
 // @icon         https://miniblox.io/favicon.png
 // @grant        unsafeWindow
 // @run-at       document-start
-// ==/UserScript==
+// ==/UserScript==let replacements = {};
+
+function addReplacement(replacement, code, replaceit) {
+	replacements[replacement] = [code, replaceit];
+}
+
+function modifyCode(text) {
+	for(const [replacement, code] of Object.entries(replacements)){
+		text = text.replaceAll(replacement, code[1] ? code[0] : replacement + code[0]);
+	}
+
+	var newScript = document.createElement("script");
+	newScript.type = "module";
+	newScript.crossOrigin = "";
+	newScript.textContent = text;
+	var head = document.querySelector("head");
+	head.appendChild(newScript);
+	newScript.textContent = "";
+	newScript.remove();
+}
 
 (function() {
 	'use strict';
+	addReplacement('this.game.unleash.isEnabled("disable-ads")', 'true', true);
 
-	async function execute(url, oldScript) {
+	async function execute(src, oldScript) {
 		if (oldScript) oldScript.type = 'javascript/blocked';
-		let data = await fetch("https://raw.githubusercontent.com/7GrandDadPGN/VapeForMiniblox/main/injection.js").then(e => e.text());
+		await fetch(src).then(e => e.text()).then(e => modifyCode(e));
 		if (oldScript) oldScript.type = 'module';
-		eval(data.replace("scripturl", url));
+		await new Promise((resolve) => {
+			const loop = setInterval(async function() {
+				resolve();
+				clearInterval(loop);
+			}, 10);
+		});
 	}
 
 	// https://stackoverflow.com/questions/22141205/intercept-and-alter-a-sites-javascript-using-greasemonkey
-	if(navigator.userAgent.indexOf("Firefox") != -1)
-	{
+	if (navigator.userAgent.indexOf("Firefox") != -1) {
 		window.addEventListener("beforescriptexecute", function(e) {
-			if(e.target.src.includes("https://miniblox.io/assets/index"))
-			{
+			if (e.target.src.includes("https://miniblox.io/assets/index")) {
 				e.preventDefault();
 				e.stopPropagation();
 				execute(e.target.src);
 			}
 		}, false);
 	}
-	else
-	{
+	else {
 		new MutationObserver(async (mutations, observer) => {
 			let oldScript = mutations
 				.flatMap(e => [...e.addedNodes])
